@@ -69,8 +69,7 @@ BEGIN
     BEGIN
         BLOCK "040004b0"
         BEGIN
-            VALUE "CompanyName", "depler (original code by crosire, ThirteenAG)"
-            VALUE "FileDescription", ""
+            VALUE "FileDescription", "https://github.com/depler/d3d8to9"
             VALUE "FileVersion", "1.0.0"
             VALUE "OriginalFilename", "d3d8.dll"
             VALUE "ProductName", "d3d8to9"
