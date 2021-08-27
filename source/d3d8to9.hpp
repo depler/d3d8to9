@@ -9,6 +9,10 @@
 #include "d3d8.hpp"
 #include "interface_query.hpp"
 
+extern "C" IMAGE_DOS_HEADER __ImageBase;
+extern UINT fpsLimit;
+extern bool windowedMode;
+
 class Direct3D8 : public IDirect3D8
 {
 	Direct3D8(const Direct3D8 &) = delete;
