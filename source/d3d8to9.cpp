@@ -62,6 +62,7 @@ extern "C" IDirect3D8 *WINAPI Direct3DCreate8(UINT SDKVersion)
 
 UINT fpsLimit = 0;
 bool windowedMode = false;
+bool fixTextures = false;
 
 bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) 
 {
@@ -90,11 +91,13 @@ bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 		
 		fpsLimit = GetPrivateProfileInt(L"main", L"fps_limit", 0, path);
 		windowedMode = GetPrivateProfileInt(L"main", L"windowed_mode", 0, path) == 1;
+		fixTextures = GetPrivateProfileInt(L"main", L"fix_textures", 0, path) == 1;
 
 #ifndef D3D8TO9NOLOG
 		LOG << "External settings loaded:" << std::endl;
 		LOG << "fps_limit = " << fpsLimit << std::endl;
 		LOG << "windowed_mode = " << windowedMode << std::endl;
+		LOG << "fix_textures = " << fixTextures << std::endl;
 #endif
 		break;
 	}

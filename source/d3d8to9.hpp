@@ -12,6 +12,7 @@
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 extern UINT fpsLimit;
 extern bool windowedMode;
+extern bool fixTextures;
 
 extern void ForceFpsLimit();
 extern void ForceWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters);

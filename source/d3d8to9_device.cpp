@@ -264,9 +264,20 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::CreateTexture(UINT Width, UINT Height
 
 	IDirect3DTexture9 *TextureInterface = nullptr;
 
-	const HRESULT hr = ProxyInterface->CreateTexture(Width, Height, Levels, Usage, Format, Pool, &TextureInterface, nullptr);
+	HRESULT hr = ProxyInterface->CreateTexture(Width, Height, Levels, Usage, Format, Pool, &TextureInterface, nullptr);
 	if (FAILED(hr))
-		return hr;
+	{
+		if (!fixTextures)
+			return hr;
+
+		if (Format == D3DFMT_X1R5G5B5)
+			hr = ProxyInterface->CreateTexture(Width, Height, Levels, Usage, D3DFMT_A1R5G5B5, Pool, &TextureInterface, nullptr);
+		else
+			return hr;
+
+		if (FAILED(hr))
+			return hr;
+	}
 
 	*ppTexture = new Direct3DTexture8(this, TextureInterface);
 
