@@ -13,6 +13,9 @@ extern "C" IMAGE_DOS_HEADER __ImageBase;
 extern UINT fpsLimit;
 extern bool windowedMode;
 
+extern void ForceFpsLimit();
+extern void ForceWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters);
+
 class Direct3D8 : public IDirect3D8
 {
 	Direct3D8(const Direct3D8 &) = delete;

@@ -104,3 +104,80 @@ bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 	}
 	return true;
 }
+
+void ForceWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters)
+{
+	HMONITOR monitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTONEAREST);
+	MONITORINFO info;
+	info.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(monitor, &info);
+	int DesktopResX = info.rcMonitor.right - info.rcMonitor.left;
+	int DesktopResY = info.rcMonitor.bottom - info.rcMonitor.top;
+
+	int left = (int)(((float)DesktopResX / 2.0f) - ((float)pPresentationParameters->BackBufferWidth / 2.0f));
+	int top = (int)(((float)DesktopResY / 2.0f) - ((float)pPresentationParameters->BackBufferHeight / 2.0f));
+
+	pPresentationParameters->Windowed = true;
+
+	SetWindowPos(pPresentationParameters->hDeviceWindow, HWND_NOTOPMOST, left, top, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight, SWP_SHOWWINDOW);
+}
+
+void ForceFpsLimit()
+{
+	static LARGE_INTEGER PerformanceCount1;
+	static LARGE_INTEGER PerformanceCount2;
+	static bool bOnce = false;
+	static double targetFrameTime = 1000.0 / fpsLimit;
+	static double t = 0.0;
+	static DWORD i = 0;
+
+	if (!bOnce)
+	{
+		bOnce = true;
+		QueryPerformanceCounter(&PerformanceCount1);
+		PerformanceCount1.QuadPart = PerformanceCount1.QuadPart >> i;
+	}
+
+	while (true)
+	{
+		QueryPerformanceCounter(&PerformanceCount2);
+
+		if (t == 0.0)
+		{
+			LARGE_INTEGER PerformanceCount3;
+			static bool bOnce2 = false;
+
+			if (!bOnce2)
+			{
+				bOnce2 = true;
+				QueryPerformanceFrequency(&PerformanceCount3);
+				i = 0;
+				t = 1000.0 / (double)PerformanceCount3.QuadPart;
+				auto v = t * 2147483648.0;
+				if (60000.0 > v)
+				{
+					while (true)
+					{
+						++i;
+						v *= 2.0;
+						t *= 2.0;
+
+						if (60000.0 <= v)
+							break;
+					}
+				}
+			}
+
+			SleepEx(0, 1);
+			break;
+		}
+
+		if (((double)((PerformanceCount2.QuadPart >> i) - PerformanceCount1.QuadPart) * t) >= targetFrameTime)
+			break;
+
+		SleepEx(0, 1);
+	}
+
+	QueryPerformanceCounter(&PerformanceCount2);
+	PerformanceCount1.QuadPart = PerformanceCount2.QuadPart >> i;
+}
