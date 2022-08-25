@@ -61,6 +61,8 @@ extern "C" IDirect3D8 *WINAPI Direct3DCreate8(UINT SDKVersion)
 }
 
 UINT fpsLimit = 0;
+bool vsyncEnabled = false;
+bool vsyncForced = false;
 bool windowedMode = false;
 bool fixTextures = false;
 
@@ -90,6 +92,8 @@ bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 		wcscat_s(path, L"\\d3d8.ini");
 		
 		fpsLimit = GetPrivateProfileInt(L"main", L"fps_limit", 0, path);
+		vsyncEnabled = GetPrivateProfileInt(L"main", L"vsyncEnabled", 0, path) == 1;
+		vsyncForced = GetPrivateProfileInt(L"main", L"vsyncForced", 0, path) == 1;
 		windowedMode = GetPrivateProfileInt(L"main", L"windowed_mode", 0, path) == 1;
 		fixTextures = GetPrivateProfileInt(L"main", L"fix_textures", 0, path) == 1;
 
@@ -108,8 +112,23 @@ bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 	return true;
 }
 
-void ForceWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters)
+void SetVsyncMode(D3DPRESENT_PARAMETERS* pPresentationParameters, bool vsyncEnabled, bool vsyncForced)
 {
+	if (vsyncEnabled && (vsyncForced || pPresentationParameters->PresentationInterval == D3DPRESENT_INTERVAL_IMMEDIATE))
+	{
+		pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+	}
+	else if (vsyncForced)
+	{
+		pPresentationParameters->PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+	}
+}
+
+void SetWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters, bool windowedMode)
+{
+	if (!windowedMode)
+		return;
+
 	HMONITOR monitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTONEAREST);
 	MONITORINFO info;
 	info.cbSize = sizeof(MONITORINFO);
@@ -125,8 +144,11 @@ void ForceWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters)
 	SetWindowPos(pPresentationParameters->hDeviceWindow, HWND_NOTOPMOST, left, top, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight, SWP_SHOWWINDOW);
 }
 
-void ForceFpsLimit()
+void SetFpsLimit(UINT fpsLimit)
 {
+	if (fpsLimit <= 0)
+		return;
+
 	static LARGE_INTEGER PerformanceCount1;
 	static LARGE_INTEGER PerformanceCount2;
 	static bool bOnce = false;

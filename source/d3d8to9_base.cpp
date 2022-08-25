@@ -195,8 +195,8 @@ HRESULT STDMETHODCALLTYPE Direct3D8::CreateDevice(UINT Adapter, D3DDEVTYPE Devic
 		}
 	}
 
-	if (windowedMode)
-		ForceWindowedMode(&PresentParams);
+	SetWindowedMode(&PresentParams, windowedMode);
+	SetVsyncMode(&PresentParams, vsyncEnabled, vsyncForced);
 
 	IDirect3DDevice9 *DeviceInterface = nullptr;
 	const HRESULT hr = ProxyInterface->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, &PresentParams, &DeviceInterface);

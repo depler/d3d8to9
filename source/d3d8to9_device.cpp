@@ -196,17 +196,16 @@ HRESULT STDMETHODCALLTYPE Direct3DDevice8::Reset(D3DPRESENT_PARAMETERS8 *pPresen
 		}
 	}
 
-	if (windowedMode)
-		ForceWindowedMode(&PresentParams);
+	SetWindowedMode(&PresentParams, windowedMode);
+	SetVsyncMode(&PresentParams, vsyncEnabled, vsyncForced);
 
 	return ProxyInterface->Reset(&PresentParams);
 }
-HRESULT STDMETHODCALLTYPE Direct3DDevice8::Present(const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion)
+HRESULT STDMETHODCALLTYPE Direct3DDevice8::Present(const RECT* pSourceRect, const RECT* pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)
 {
 	UNREFERENCED_PARAMETER(pDirtyRegion);
 
-	if (fpsLimit > 0)
-		ForceFpsLimit();
+	SetFpsLimit(fpsLimit);
 
 	return ProxyInterface->Present(pSourceRect, pDestRect, hDestWindowOverride, nullptr);
 }

@@ -11,11 +11,14 @@
 
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 extern UINT fpsLimit;
+extern bool vsyncEnabled;
+extern bool vsyncForced;
 extern bool windowedMode;
 extern bool fixTextures;
 
-extern void ForceFpsLimit();
-extern void ForceWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters);
+extern void SetFpsLimit(UINT fpsLimit);
+extern void SetWindowedMode(D3DPRESENT_PARAMETERS* pPresentationParameters, bool windowedMode);
+extern void SetVsyncMode(D3DPRESENT_PARAMETERS* pPresentationParameters, bool vsyncEnabled, bool vsyncForced);
 
 class Direct3D8 : public IDirect3D8
 {
